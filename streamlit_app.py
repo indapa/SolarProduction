@@ -27,7 +27,7 @@ def plot_power_production(data):
     plt.figure(figsize=(10, 6))
     sns.lineplot(x='Time', y='Production', hue='Month', data=data)
     plt.xlabel('Date')
-    plt.ylabel('Power (kW)')
+    plt.ylabel('Power (kWh)')
     plt.title('Solar Panel Power Production')
     plt.legend(title='Month', loc='upper right')
     plt.xticks(rotation=90)  # Rotate x-axis labels by 90 degrees
