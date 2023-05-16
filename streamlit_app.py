@@ -7,7 +7,7 @@ import sys
 
 
 
-solar_file = Path(__file__).parent / "solar_production.csv"
+solar_file = Path(__file__).parent / "solar_production_2023.csv"
 # Load data
 data = pd.read_csv(solar_file)
 # Streamlit app code
