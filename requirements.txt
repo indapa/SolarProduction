@@ -3,4 +3,4 @@ streamlit
 seaborn
 matplotlib
 path
-sys
+
