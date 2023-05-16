@@ -2,14 +2,15 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-import path
+from pathlib import Path
 import sys
 
-dir = path.Path(__file__).abspath()
-sys.append.path(dir.parent.parent)
-# Load data
-data = pd.read_csv('./solar_production_2023.csv')
 
+
+solar_file = Path(__file__).parent / "solar_production_2023.csv"
+# Load data
+data = pd.read_csv(solar_file = Path(__file__).parent / "solar_production_2023.csv"
+)
 # Streamlit app code
 def main():
     st.title("Solar Panel Power Production")
