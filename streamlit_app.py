@@ -30,6 +30,9 @@ def plot_power_production(data):
     
     plt.figure(figsize=(10, 6))
     sns.lineplot(x='Time', y='Production', hue='Month', data=data)
+    sns.boxplot(x="Time", y="Production", data=data)
+    sns.stripplot(x="Time", y="Production", data=data, jitter=True, color="black", size=3)
+
     plt.xlabel('Date')
     plt.ylabel('Power (kWh)')
     plt.title('Solar Panel Power Production')
