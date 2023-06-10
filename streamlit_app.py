@@ -26,14 +26,14 @@ def main():
 # Function to plot power production 
 def plot_power_production(data):
     data['Time'] = pd.to_datetime(data['Time'])  # Convert to datetime format
-    data['Month'] = data['Time'].dt.month  # Extract month information
+    data['Month'] = data['Time'].dt.strftime("%B") # Extract month information
     
     plt.figure(figsize=(10, 6))
-    sns.lineplot(x='Time', y='Production', hue='Month', data=data)
-    sns.boxplot(x="Time", y="Production", data=data)
-    sns.stripplot(x="Time", y="Production", data=data, jitter=True, color="black", size=3)
+    sns.boxplot(x='Month', y='Production', data=data)
+    sns.swarmplot(x='Month', y='Production', data=data, color="grey")
+    
 
-    plt.xlabel('Date')
+    plt.xlabel('Month')
     plt.ylabel('Power (kWh)')
     plt.title('Solar Panel Power Production')
     plt.legend(title='Month', loc='upper right')
