@@ -20,7 +20,7 @@ def main():
     st.dataframe(data)
 
     # Plotting the data
-    st.subheader("Power Production Over Time")
+    st.subheader("Solar Production 2023")
     plot_power_production(data)
 
 # Function to plot power production 
