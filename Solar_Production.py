@@ -6,28 +6,37 @@ from pathlib import Path
 import sys
 import plotly.express as px
 
+st.markdown("# Yearly production ")
+st.sidebar.markdown("# Yearly production")
+# Add a selectbox to the sidebar:
+add_selectbox = st.sidebar.selectbox(
+    'Select Year',
+    ( [2023])
+)
+
 
 solar_file = Path(__file__).parent / "solar_production_2023.csv"
 # Load data
 data = pd.read_csv(solar_file)
+
+
 data['cumulative']=data['Production'].cumsum()
 # Streamlit app code
 def main():
-    st.title("Solar Panel Power Production")
-    st.write("Solar Production")
+    
 
     # Display the loaded data
     st.subheader("Solar Panel Data")
     st.dataframe(data)
 
     # Plotting the data
-    st.subheader("Daily Solar Production 2023")
+    st.subheader("Daily solar production ")
     #plot_power_production(data)
     plot_power_production_plotly(data)
 
 
     # Plotting cumulative power production
-    st.subheader("Cumulative Solar Production 2023")
+    st.subheader("Cumulative Solar Production")
     #plot_cumulative_power_production(data)
     plot_cumulative_power_production_plotly(data)
 
@@ -36,7 +45,7 @@ def plot_power_production_plotly(data):
     data['Time'] = pd.to_datetime(data['Time'])  # Convert to datetime format
     data['Month'] = data['Time'].dt.strftime("%B") # Extract month information
     
-    fig = px.box(data, x='Month', y='Production', color='Month', title='Solar Panel Power Production', points="all", 
+    fig = px.box(data, x='Month', y='Production', color='Month', points="all", 
                  width=900, height=900)
        
     fig.update_traces(quartilemethod="exclusive")  # or "inclusive", or "linear" by default
@@ -57,7 +66,7 @@ def plot_power_production(data):
 
     plt.xlabel('Month')
     plt.ylabel('Power (kWh)')
-    plt.title('Solar Panel Power Production')
+    #plt.title('Solar Panel Power Production')
     plt.legend(title='Month', loc='upper right')
     plt.xticks(rotation=90)  # Rotate x-axis labels by 90 degrees
     plt.grid(True)
@@ -69,12 +78,12 @@ def plot_cumulative_power_production(data):
     sns.lineplot(x='Time', y='cumulative', data=data)
     plt.xlabel('Time')
     plt.ylabel('Cumulative Power (kWh)')
-    plt.title('Cumulative Solar Panel Power Production')
+    #plt.title('Cumulative Solar Panel Power Production')
     plt.grid(True)
     st.pyplot(plt)
 
 def plot_cumulative_power_production_plotly(data):
-    fig = px.line(data, x='Time', y='cumulative', title='Cumulative Solar Panel Power Production', width=900, height=900)
+    fig = px.line(data, x='Time', y='cumulative', width=900, height=900)
     fig.update_layout(xaxis_title="Time", yaxis_title="Cumulative Power (kWh)")
     st.plotly_chart(fig)
   
