@@ -17,7 +17,7 @@ years = data['year'].unique()
 # Add a selectbox to the sidebar:
 add_selectbox = st.sidebar.selectbox(
     'Select Year',
-    ( years ), index=1
+    ( years ), index=2
 )
 st.write('You selected:', add_selectbox)
 #subset data to selected year
