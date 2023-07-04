@@ -8,16 +8,21 @@ import plotly.express as px
 
 st.markdown("# Yearly production ")
 st.sidebar.markdown("# Yearly production")
+solar_file = Path(__file__).parent / "solar_production.csv"
+# Load data
+data = pd.read_csv(solar_file)
+
+#distinct values in time column of data
+years = data['year'].unique()
 # Add a selectbox to the sidebar:
 add_selectbox = st.sidebar.selectbox(
     'Select Year',
-    ( [2023])
+    ( years ), index=1
 )
+st.write('You selected:', add_selectbox)
+#subset data to selected year
+data = data[data['year'] == add_selectbox]
 
-
-solar_file = Path(__file__).parent / "solar_production_2023.csv"
-# Load data
-data = pd.read_csv(solar_file)
 
 
 data['cumulative']=data['Production'].cumsum()
