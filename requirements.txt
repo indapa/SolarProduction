@@ -4,6 +4,6 @@ seaborn
 matplotlib
 pathlib
 plotly.express
-
+python==3.9.12
 
 
