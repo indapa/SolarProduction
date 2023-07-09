@@ -9,7 +9,7 @@ import plotly.express as px
 # Load data
 solar_file = Path(__file__).parent.parent / "solar_production.csv"
 
-data = pd.read_csv(solar_file)
+data = pd.read_csv(solar_file, index_col=0)
 data['Time'] = pd.to_datetime(data['Time'])  # Convert to datetime format
 data['ym']=data['Time'].dt.strftime('%Y-%m')
 data['Year'] = data['Time'].dt.strftime("%Y") # Extract year information
@@ -23,7 +23,7 @@ time_frame_select = st.sidebar.selectbox(
     )
     
 def plotly_monthly_comparative_production(data):
-    data.drop(columns=['Unnamed: 0'], inplace=True)
+    #data.drop(columns=['Unnamed: 0'], inplace=True)
     
     year_month_df= data.groupby(['Year', 'Month']).sum().reset_index()
     year_month_df.rename(columns={'Production':'Monthly_Production'}, inplace=True)
