@@ -6,14 +6,17 @@ from pathlib import Path
 import sys
 import plotly.express as px
 
-st.markdown("# Yearly production ")
-st.sidebar.markdown("# Yearly production")
+st.markdown("# Daily production ")
+st.sidebar.markdown("# Daily production")
 solar_file = Path(__file__).parent / "solar_production.csv"
 # Load data
 data = pd.read_csv(solar_file)
 
-#distinct values in time column of data
-years = data['year'].unique()
+#d
+data['Time'] = pd.to_datetime(data['Time'])  # Convert to datetime format
+data['Year'] = data['Time'].dt.strftime("%Y") # Extract year information
+data['Month'] = data['Time'].dt.strftime("%B") # Extract month information
+years = data['Year'].unique()
 # Add a selectbox to the sidebar:
 add_selectbox = st.sidebar.selectbox(
     'Select Year',
@@ -21,7 +24,7 @@ add_selectbox = st.sidebar.selectbox(
 )
 st.write('You selected:', add_selectbox)
 #subset data to selected year
-data = data[data['year'] == add_selectbox]
+data = data[data['Year'] == add_selectbox]
 
 
 
@@ -31,8 +34,8 @@ def main():
     
 
     # Display the loaded data
-    st.subheader("Solar Panel Data")
-    st.dataframe(data)
+    
+    #st.dataframe(data)
 
     # Plotting the data
     st.subheader("Daily solar production ")
@@ -47,8 +50,8 @@ def main():
 
 # function to plot power function in plotly
 def plot_power_production_plotly(data):
-    data['Time'] = pd.to_datetime(data['Time'])  # Convert to datetime format
-    data['Month'] = data['Time'].dt.strftime("%B") # Extract month information
+    #data['Time'] = pd.to_datetime(data['Time'])  # Convert to datetime format
+    #data['Month'] = data['Time'].dt.strftime("%B") # Extract month information
     
     fig = px.box(data, x='Month', y='Production', color='Month', points="all", 
                  width=900, height=900)
@@ -59,33 +62,8 @@ def plot_power_production_plotly(data):
 
 
     
-# Function to plot power production 
-def plot_power_production(data):
-    data['Time'] = pd.to_datetime(data['Time'])  # Convert to datetime format
-    data['Month'] = data['Time'].dt.strftime("%B") # Extract month information
-    
-    plt.figure(figsize=(10, 6))
-    sns.boxplot(x='Month', y='Production', data=data)
-    sns.swarmplot(x='Month', y='Production', data=data, color="grey")
-    
 
-    plt.xlabel('Month')
-    plt.ylabel('Power (kWh)')
-    #plt.title('Solar Panel Power Production')
-    plt.legend(title='Month', loc='upper right')
-    plt.xticks(rotation=90)  # Rotate x-axis labels by 90 degrees
-    plt.grid(True)
-    st.pyplot(plt)
 
-# function to plot cumulative power production in seaborn
-def plot_cumulative_power_production(data): 
-    plt.figure(figsize=(10, 6))
-    sns.lineplot(x='Time', y='cumulative', data=data)
-    plt.xlabel('Time')
-    plt.ylabel('Cumulative Power (kWh)')
-    #plt.title('Cumulative Solar Panel Power Production')
-    plt.grid(True)
-    st.pyplot(plt)
 
 def plot_cumulative_power_production_plotly(data):
     fig = px.line(data, x='Time', y='cumulative', width=900, height=900)
