@@ -56,9 +56,9 @@ def plotly_monthly_comparative_production(data):
 def main():
 
 
-    st.markdown("# Comparative Production")
+    st.markdown("# Comparative Production" + ':sun_with_face:')
     
-    st.subheader("Comparative Production")
+    
     #select time period sidebar
     
     
