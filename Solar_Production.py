@@ -6,7 +6,7 @@ from pathlib import Path
 import sys
 import plotly.express as px
 
-st.subheader("Daily solar production " + ':sun_with_face:')
+
 st.sidebar.markdown("# Daily production" +  ':chart:')
 solar_file = Path(__file__).parent / "solar_production.csv"
 # Load data
@@ -38,7 +38,7 @@ def main():
    
 
     # Plotting the data
-    st.subheader("Monthly solar production " + ':sun_with_face:')
+    st.subheader("Daily solar production " + ':sun_with_face:')
     #plot_power_production(data)
     plot_power_production_plotly(data)
 
