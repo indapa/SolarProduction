@@ -25,7 +25,8 @@ time_frame_select = st.sidebar.selectbox(
     )
     
 def plotly_monthly_comparative_production(data):
-    
+    data=data[['Year', 'Month', 'Production']]
+    st.write(data)
     year_month_df= data.groupby(['Year', 'Month']).sum().reset_index()
     year_month_df.rename(columns={'Production':'Monthly_Production'}, inplace=True)
     year_month_df['Month'] = pd.to_numeric(year_month_df['Month'])
