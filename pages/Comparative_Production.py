@@ -5,6 +5,7 @@ import seaborn as sns
 from pathlib import Path
 import sys
 import plotly.express as px
+import numpy as np
 
 # Load data
 solar_file = Path(__file__).parent.parent / "solar_production.csv"
@@ -21,9 +22,23 @@ data = data.sort_values('Time')
 st.sidebar.markdown("# Comparative Production" + ':chart:') 
 time_frame_select = st.sidebar.selectbox(
         'Select Time Period',
-        ( ['month', 'year'])
+        ( ['month', 'year', 'quarter'])
     )
+
+# plot quarterly comparative production
+def plotly_quarterly_comparative_production(data):
     
+    conditions = [ (data['Month'] <=3), (data['Month']  <=6), (data['Month'] <=9), (data['Month'] <=12)]
+    values = ['Q1', 'Q2', 'Q3', 'Q4']
+    data['Quarter']= np.select(conditions, values)
+    
+    data=data[['Year', 'Quarter', 'Production']]
+    year_quarter_df= data.groupby(['Year', 'Quarter']).sum().reset_index()
+    year_quarter_df.rename(columns={'Production':'Quarterly_Production'}, inplace=True)
+    year_quarter_df['Year'] = year_quarter_df['Year'].astype(str)
+    fig = px.bar(year_quarter_df, x='Quarter', y='Quarterly_Production', color='Year', barmode='group')
+    st.plotly_chart(fig)
+
 # plot yearly compparative production
 def plotly_yearly_comparative_production(data):
     data=data[['Year', 'Production']]
@@ -75,6 +90,8 @@ def main():
         plotly_yearly_comparative_production(data)
     elif time_frame_select == 'month':  
         plotly_monthly_comparative_production(data)
+    else:
+        plotly_quarterly_comparative_production(data)
     
 if __name__ == '__main__':
     main()
