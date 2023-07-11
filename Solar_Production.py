@@ -35,7 +35,7 @@ def main():
 
     # Display the loaded data
     
-    st.dataframe(data)
+   
 
     # Plotting the data
     st.subheader("Monthly solar production " + ':sun_with_face:')
