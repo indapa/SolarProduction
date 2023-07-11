@@ -59,7 +59,7 @@ def plot_power_production_plotly(data):
                  width=900, height=900)
        
     fig.update_traces(quartilemethod="exclusive")  # or "inclusive", or "linear" by default
-    fig.update_layout(xaxis_title="Month", yaxis_title="Power (kWh)")
+    fig.update_layout(xaxis_title="Month", yaxis_title="Production (kWh)")
     st.plotly_chart(fig)
 
 
@@ -69,7 +69,7 @@ def plot_power_production_plotly(data):
 
 def plot_cumulative_power_production_plotly(data):
     fig = px.line(data, x='Time', y='cumulative', width=900, height=900)
-    fig.update_layout(xaxis_title="Time", yaxis_title="Cumulative Power (kWh)")
+    fig.update_layout(xaxis_title="Time", yaxis_title="Cumulative Production (kWh)")
     st.plotly_chart(fig)
   
 

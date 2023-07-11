@@ -37,6 +37,7 @@ def plotly_quarterly_comparative_production(data):
     year_quarter_df.rename(columns={'Production':'Quarterly_Production'}, inplace=True)
     year_quarter_df['Year'] = year_quarter_df['Year'].astype(str)
     fig = px.bar(year_quarter_df, x='Quarter', y='Quarterly_Production', color='Year', barmode='group')
+    fig.update_layout(xaxis_title="Quarter", yaxis_title="Quarterly Production (kWh)")
     st.plotly_chart(fig)
 
 # plot yearly compparative production
@@ -46,6 +47,8 @@ def plotly_yearly_comparative_production(data):
     year_df.rename(columns={'Production':'Yearly_Production'}, inplace=True)
     year_df['Year'] = year_df['Year'].astype(str)
     fig = px.bar(year_df, x='Year', y='Yearly_Production', color='Year', barmode='group')
+    
+    fig.update_layout(xaxis_title="Year", yaxis_title="Yearly Production (kWh)")
     st.plotly_chart(fig)
 
 def plotly_monthly_comparative_production(data):
@@ -73,6 +76,7 @@ def plotly_monthly_comparative_production(data):
 
     
     fig = px.bar(year_month_df, x='Month', y='Monthly_Production', color='Year', barmode='group')
+    fig.update_layout(xaxis_title="Month", yaxis_title="Monthly Production (kWh)")
 
     st.plotly_chart(fig)
     
