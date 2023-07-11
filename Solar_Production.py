@@ -6,8 +6,8 @@ from pathlib import Path
 import sys
 import plotly.express as px
 
-st.markdown("# Daily production ")
-st.sidebar.markdown("# Daily production")
+st.subheader("Daily solar production " + ':sun_with_face:')
+st.sidebar.markdown("# Daily production" +  ':chart:')
 solar_file = Path(__file__).parent / "solar_production.csv"
 # Load data
 data = pd.read_csv(solar_file)
@@ -35,16 +35,16 @@ def main():
 
     # Display the loaded data
     
-    #st.dataframe(data)
+    st.dataframe(data)
 
     # Plotting the data
-    st.subheader("Daily solar production ")
+    st.subheader("Monthly solar production " + ':sun_with_face:')
     #plot_power_production(data)
     plot_power_production_plotly(data)
 
 
     # Plotting cumulative power production
-    st.subheader("Cumulative Solar Production")
+    st.subheader("Cumulative Solar Production"  + ':sun_with_face:')
     #plot_cumulative_power_production(data)
     plot_cumulative_power_production_plotly(data)
 
