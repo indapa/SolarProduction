@@ -13,7 +13,9 @@ data = pd.read_csv(solar_file, index_col=0)
 data['Time'] = pd.to_datetime(data['Time'])  # Convert to datetime format
 data['ym']=data['Time'].dt.strftime('%Y-%m')
 data['Year'] = data['Time'].dt.strftime("%Y") # Extract year information
-data['Month'] = data['Time'].dt.strftime("%B") # Extract month information
+data['Month'] = data['Time'].dt.strftime("%m") # Extract month information
+data['Month'] = pd.to_numeric(data['Month'])
+data['Year'] = pd.to_numeric(data['Year'])
 data = data.sort_values('Time')
 
 st.sidebar.markdown("# Comparative Production" + ':chart:') 
@@ -23,9 +25,7 @@ time_frame_select = st.sidebar.selectbox(
     )
     
 def plotly_monthly_comparative_production(data):
-    data['Month'] = data['Time'].dt.strftime("%m") # Extract month information
-    data['Month'] = pd.to_numeric(data['Month'])
-    data['Year'] = pd.to_numeric(data['Year'])
+    
     year_month_df= data.groupby(['Year', 'Month']).sum().reset_index()
     year_month_df.rename(columns={'Production':'Monthly_Production'}, inplace=True)
     year_month_df['Month'] = pd.to_numeric(year_month_df['Month'])
