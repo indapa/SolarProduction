@@ -22,7 +22,7 @@ add_selectbox = st.sidebar.selectbox(
     'Select Year',
     ( years ), index=2
 )
-st.write('You selected:', add_selectbox)
+
 #subset data to selected year
 data = data[data['Year'] == add_selectbox]
 
@@ -38,13 +38,15 @@ def main():
    
 
     # Plotting the data
-    st.subheader("Daily solar production " + ':sun_with_face:')
+    st.markdown("# Daily Production" + ':sun_with_face:')
+    
+    st.write('You selected:', add_selectbox)
     #plot_power_production(data)
     plot_power_production_plotly(data)
 
 
     # Plotting cumulative power production
-    st.subheader("Cumulative Solar Production"  + ':sun_with_face:')
+    st.markdown("# Cumulative Solar Production"  + ':sun_with_face:')
     #plot_cumulative_power_production(data)
     plot_cumulative_power_production_plotly(data)
 

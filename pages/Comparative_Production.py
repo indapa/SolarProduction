@@ -21,9 +21,18 @@ data = data.sort_values('Time')
 st.sidebar.markdown("# Comparative Production" + ':chart:') 
 time_frame_select = st.sidebar.selectbox(
         'Select Time Period',
-        ( ['month'])
+        ( ['month', 'year'])
     )
     
+# plot yearly compparative production
+def plotly_yearly_comparative_production(data):
+    data=data[['Year', 'Production']]
+    year_df= data.groupby(['Year']).sum().reset_index()
+    year_df.rename(columns={'Production':'Yearly_Production'}, inplace=True)
+    year_df['Year'] = year_df['Year'].astype(str)
+    fig = px.bar(year_df, x='Year', y='Yearly_Production', color='Year', barmode='group')
+    st.plotly_chart(fig)
+
 def plotly_monthly_comparative_production(data):
     data=data[['Year', 'Month', 'Production']]
     
@@ -62,8 +71,10 @@ def main():
     #select time period sidebar
     
     
-    
-    plotly_monthly_comparative_production(data)
+    if time_frame_select == 'year':
+        plotly_yearly_comparative_production(data)
+    elif time_frame_select == 'month':  
+        plotly_monthly_comparative_production(data)
     
 if __name__ == '__main__':
     main()
