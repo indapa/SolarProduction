@@ -16,27 +16,38 @@ data['Year'] = data['Time'].dt.strftime("%Y") # Extract year information
 data['Month'] = data['Time'].dt.strftime("%B") # Extract month information
 data = data.sort_values('Time')
 
-
+st.sidebar.markdown("# Comparative Production" + ':chart:') 
 time_frame_select = st.sidebar.selectbox(
         'Select Time Period',
         ( ['month'])
     )
     
 def plotly_monthly_comparative_production(data):
-    #data.drop(columns=['Unnamed: 0'], inplace=True)
-    
+    data['Month'] = data['Time'].dt.strftime("%m") # Extract month information
+    data['Month'] = pd.to_numeric(data['Month'])
+    data['Year'] = pd.to_numeric(data['Year'])
     year_month_df= data.groupby(['Year', 'Month']).sum().reset_index()
     year_month_df.rename(columns={'Production':'Monthly_Production'}, inplace=True)
-    data_year_month_df = year_month_df.merge(data, indicator=True)
-    #find common columns between data and year_month_df
-    #common_columns = data_year_month_df.columns.intersection(year_month_df.columns)
-    #st.write(common_columns)
-    data_year_month_df.sort_values('ym', inplace=True)
-    data_year_month_df=data_year_month_df[['Year', 'Month', 'Monthly_Production']]
-    data_year_month_df.drop_duplicates(inplace=True)
+    year_month_df['Month'] = pd.to_numeric(year_month_df['Month'])
+    year_month_df['Year'] = pd.to_numeric(year_month_df['Year'])
+
+    numeric_to_abbr={ 1:'January',
+                    2:'February',
+                    3:'March',
+                    4:'April',
+                    5:'May',
+                    6:'June',
+                    7:'July',
+                    8:'August',
+                    9:'September',
+                    10:'October',
+                    11:'November',
+                    12:'December'}
+    year_month_df=year_month_df.replace({"Month": numeric_to_abbr})
+    year_month_df['Year'] = year_month_df['Year'].astype(str)
+
     
-    
-    fig = px.bar(data_year_month_df, x='Month', y='Monthly_Production', color='Year', barmode='group')
+    fig = px.bar(year_month_df, x='Month', y='Monthly_Production', color='Year', barmode='group')
 
     st.plotly_chart(fig)
     
@@ -45,11 +56,11 @@ def main():
 
 
     st.markdown("# Comparative Production")
-    st.sidebar.markdown("# Comparative Production") 
+    
     st.subheader("Comparative Production")
     #select time period sidebar
     
-   
+    
     
     plotly_monthly_comparative_production(data)
     
