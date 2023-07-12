@@ -38,7 +38,7 @@ def main():
    
 
     # Plotting the data
-    st.markdown("# Daily Production" + ':sun_with_face:')
+    st.markdown("# Daily Solar Production" + ':sun_with_face:')
     
     st.write('You selected:', add_selectbox)
     #plot_power_production(data)
