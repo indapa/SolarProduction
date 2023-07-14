@@ -36,12 +36,13 @@ def main():
     # Display the loaded data
     
     st.markdown("# Solar Production Data" + ':sun_with_face:')
+    st.write('You selected:', add_selectbox)
     AgGrid(data, height=500, width='100%', theme='alpine')
 
     # Plotting the data
     st.markdown("# Daily Solar Production" + ':sun_with_face:')
     
-    st.write('You selected:', add_selectbox)
+    
     #plot_power_production(data)
     plot_power_production_plotly(data)
 
