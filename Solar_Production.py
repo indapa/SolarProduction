@@ -5,14 +5,14 @@ import seaborn as sns
 from pathlib import Path
 import sys
 import plotly.express as px
-
+from st_aggrid import AgGrid
 
 st.sidebar.markdown("# Daily production" +  ':chart:')
 solar_file = Path(__file__).parent / "solar_production.csv"
 # Load data
-data = pd.read_csv(solar_file)
+data = pd.read_csv(solar_file, index_col=0)
 
-#d
+
 data['Time'] = pd.to_datetime(data['Time'])  # Convert to datetime format
 data['Year'] = data['Time'].dt.strftime("%Y") # Extract year information
 data['Month'] = data['Time'].dt.strftime("%B") # Extract month information
@@ -23,10 +23,10 @@ add_selectbox = st.sidebar.selectbox(
     ( years ), index=2
 )
 
+
+
 #subset data to selected year
 data = data[data['Year'] == add_selectbox]
-
-
 
 data['cumulative']=data['Production'].cumsum()
 # Streamlit app code
@@ -35,7 +35,8 @@ def main():
 
     # Display the loaded data
     
-   
+    st.markdown("# Solar Production Data" + ':sun_with_face:')
+    AgGrid(data, height=500, width='100%', theme='alpine')
 
     # Plotting the data
     st.markdown("# Daily Solar Production" + ':sun_with_face:')

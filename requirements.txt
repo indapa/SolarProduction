@@ -4,3 +4,4 @@ seaborn==0.12.1
 matplotlib==3.6.0
 pathlib
 plotly.express
+st_aggrid
