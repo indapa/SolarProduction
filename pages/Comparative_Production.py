@@ -6,6 +6,7 @@ from pathlib import Path
 import sys
 import plotly.express as px
 import numpy as np
+from st_aggrid import AgGrid
 
 # Load data
 solar_file = Path(__file__).parent.parent / "solar_production.csv"
@@ -96,6 +97,8 @@ def main():
         plotly_monthly_comparative_production(data)
     else:
         plotly_quarterly_comparative_production(data)
+
+    
     
 if __name__ == '__main__':
     main()

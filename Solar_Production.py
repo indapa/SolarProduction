@@ -30,27 +30,7 @@ data = data[data['Year'] == add_selectbox]
 
 data['cumulative']=data['Production'].cumsum()
 # Streamlit app code
-def main():
-    
 
-    # Display the loaded data
-    
-    st.markdown("# Solar Production Data" + ':sun_with_face:')
-    st.write('You selected:', add_selectbox)
-    AgGrid(data, height=500, width='100%', theme='alpine')
-
-    # Plotting the data
-    st.markdown("# Daily Solar Production" + ':sun_with_face:')
-    
-    
-    #plot_power_production(data)
-    plot_power_production_plotly(data)
-
-
-    # Plotting cumulative power production
-    st.markdown("# Cumulative Solar Production"  + ':sun_with_face:')
-    #plot_cumulative_power_production(data)
-    plot_cumulative_power_production_plotly(data)
 
 # function to plot power function in plotly
 def plot_power_production_plotly(data):
@@ -62,7 +42,7 @@ def plot_power_production_plotly(data):
        
     fig.update_traces(quartilemethod="exclusive")  # or "inclusive", or "linear" by default
     fig.update_layout(xaxis_title="Month", yaxis_title="Production (kWh)")
-    st.plotly_chart(fig)
+    st.plotly_chart(fig,use_container_width=True)
 
 
     
@@ -72,7 +52,32 @@ def plot_power_production_plotly(data):
 def plot_cumulative_power_production_plotly(data):
     fig = px.line(data, x='Time', y='cumulative', width=900, height=900)
     fig.update_layout(xaxis_title="Time", yaxis_title="Cumulative Production (kWh)")
-    st.plotly_chart(fig)
+    st.plotly_chart(fig,use_container_width=True)
+
+def main():
+    
+
+    # Display the loaded data
+    
+    st.markdown("# Solar Production Data" + ':sun_with_face:')
+    st.write('You selected:', add_selectbox)
+    with st.expander("Click to expand"):
+    
+        AgGrid(data, height=500, width='100%', theme='alpine')
+
+    # Plotting the data
+    st.markdown("# Daily Solar Production" + ':sun_with_face:')
+    with  st.expander("Click to expand"):
+    
+    
+        #plot_power_production(data)
+        plot_power_production_plotly(data)
+
+
+    # Plotting cumulative power production
+    st.markdown("# Cumulative Solar Production"  + ':sun_with_face:')
+    with st.expander("Click to expand"):
+        plot_cumulative_power_production_plotly(data)
   
 
 if __name__ == '__main__':
