@@ -6,7 +6,7 @@ from pathlib import Path
 import sys
 import plotly.express as px
 from st_aggrid import AgGrid
-
+st.set_page_config(layout="wide")
 st.sidebar.markdown("# Daily production" +  ':chart:')
 solar_file = Path(__file__).parent / "solar_production.csv"
 # Load data
@@ -57,27 +57,27 @@ def plot_cumulative_power_production_plotly(data):
 def main():
     
 
-    # Display the loaded data
-    
+  
     st.markdown("# Solar Production Data" + ':sun_with_face:')
     st.write('You selected:', add_selectbox)
-    with st.expander("Click to expand"):
     
-        AgGrid(data, height=500, width='100%', theme='alpine')
+    with st.expander("View Data"):
+        
+        AgGrid(data, wdith=500, height=900)
 
     # Plotting the data
     st.markdown("# Daily Solar Production" + ':sun_with_face:')
-    with  st.expander("Click to expand"):
     
     
-        #plot_power_production(data)
-        plot_power_production_plotly(data)
+    
+    #plot_power_production(data)
+    plot_power_production_plotly(data)
 
 
     # Plotting cumulative power production
     st.markdown("# Cumulative Solar Production"  + ':sun_with_face:')
-    with st.expander("Click to expand"):
-        plot_cumulative_power_production_plotly(data)
+    
+    plot_cumulative_power_production_plotly(data)
   
 
 if __name__ == '__main__':
