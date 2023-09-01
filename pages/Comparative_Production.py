@@ -7,6 +7,8 @@ import sys
 import plotly.express as px
 import numpy as np
 from st_aggrid import AgGrid
+import plotly.graph_objects as go
+
 
 # Load data
 solar_file = Path(__file__).parent.parent / "solar_production.csv"
@@ -23,8 +25,31 @@ data = data.sort_values('Time')
 st.sidebar.markdown("# Comparative Production" + ':chart:') 
 time_frame_select = st.sidebar.selectbox(
         'Select Time Period',
-        ( ['month', 'year', 'quarter'])
+        ( ['month', 'year', 'quarter', 'cumulative'])
     )
+# plot cumulative production by year, with each year as  line
+def plotly_yearly_production(data):
+    data=data[['Year', 'Production']]
+    year_df= data.groupby(['Year']).sum().reset_index()
+    year_df.rename(columns={'Production':'Yearly_Production'}, inplace=True)
+    year_df['Year'] = year_df['Year'].astype(str)
+    fig = px.line(year_df, x='Year', y='Yearly_Production', width=900, height=900)
+    fig.update_layout(xaxis_title="Year", yaxis_title="Yearly Production (kWh)")
+    st.plotly_chart(fig,use_container_width=True)
+
+
+# plot cumulative production by year
+def plotly_cumulative_production(data):
+    
+    data['Cumulative Production'] = data.groupby('Year')['Production'].cumsum()
+    fig = go.Figure()
+    for year, group in data.groupby("Year"):
+        fig.add_trace(go.Scatter(x=group["Time"], y=group["Cumulative Production"], name=year))
+        fig.update_layout(legend_title_text = "Cumulative production")
+        fig.update_xaxes(title_text="Year")
+        fig.update_yaxes(title_text="Production (kWh)")
+    
+    st.plotly_chart(fig,use_container_width=True)
 
 # plot quarterly comparative production
 def plotly_quarterly_comparative_production(data):
@@ -95,6 +120,8 @@ def main():
         plotly_yearly_comparative_production(data)
     elif time_frame_select == 'month':  
         plotly_monthly_comparative_production(data)
+    elif time_frame_select == 'cumulative':
+        plotly_cumulative_production(data)
     else:
         plotly_quarterly_comparative_production(data)
 
