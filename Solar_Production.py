@@ -46,6 +46,8 @@ def plot_power_production_plotly(data):
 
 
     
+# add multiple traces to plotly express line plot for each year
+
 
 
 
@@ -62,7 +64,7 @@ def main():
     st.write('You selected:', add_selectbox)
     
     with st.expander("View Data"):
-        
+    
         AgGrid(data, wdith=500, height=900)
 
     # Plotting the data
