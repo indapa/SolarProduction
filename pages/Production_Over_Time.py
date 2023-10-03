@@ -57,14 +57,28 @@ def _plot_data_over_time(data: pd.DataFrame):
     plt.title('Production over Time', fontsize=20)
     return plt
 
+def _plot_data_over_time_plotly(data: pd.DataFrame):
+    # make plotly version of _plot_data_over_time function
+    data['Time'] = pd.to_datetime(data['Time'], errors='coerce')
+    data = data[pd.notna(data['Time'])]
+    fig = px.scatter(data, x='Time', y='Production')
+
+    #set fig size 
+    fig.update_layout(height=600, width=800)
+    fig.update_layout( xaxis_title='Date', yaxis_title='Production (kWh))')
+    return fig
+
 def main():
 
 
     st.markdown("# Daily Production Over Time" + ':sun_with_face:')
     
     #filtered_data=filter_dates(date_range)
-    plt=_plot_data_over_time(data)
-    st.pyplot(plt)
+    #plt=_plot_data_over_time(data)
+    fig =_plot_data_over_time_plotly(data)
+
+    #st.pyplot(plt)
+    st.plotly_chart(fig)
     
 
     
