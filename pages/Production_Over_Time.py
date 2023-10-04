@@ -5,6 +5,9 @@ import streamlit as st
 import plotly.express as px
 from pathlib import Path
 from datetime import datetime
+import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go  # Import Plotly's graph_objects module for adding traces
 
 # Load data
 st.sidebar.markdown("# Production Over Time" + ':chart:')
@@ -57,16 +60,37 @@ def _plot_data_over_time(data: pd.DataFrame):
     plt.title('Production over Time', fontsize=20)
     return plt
 
+
+
+
+
 def _plot_data_over_time_plotly(data: pd.DataFrame):
-    # make plotly version of _plot_data_over_time function
+    # Convert the 'Time' column to datetim
     data['Time'] = pd.to_datetime(data['Time'], errors='coerce')
     data = data[pd.notna(data['Time'])]
-    fig = px.scatter(data, x='Time', y='Production')
-
-    #set fig size 
+    
+    # Calculate the mean value of 'Production'
+    mean_production = data['Production'].mean()
+    
+    # Create a scatter plot
+    fig = px.scatter(data, x='Time', y='Production', title='Production Over Time')
+    
+    # Add a dashed line for the mean value
+    fig.add_trace(go.Scatter(x=[data['Time'].min(), data['Time'].max()],  # Line spans the entire x-axis
+                             y=[mean_production, mean_production],
+                             mode='lines',
+                             line=dict(dash='dash'),
+                             name=f'Mean Production: {mean_production:.2f} kWh'))
+    
+    # Set figure size
     fig.update_layout(height=600, width=800)
-    fig.update_layout( xaxis_title='Date', yaxis_title='Production (kWh))')
+    
+    # Set axis labels
+    fig.update_xaxes(title_text='Date')
+    fig.update_yaxes(title_text='Production (kWh)')
+    
     return fig
+
 
 def main():
 
