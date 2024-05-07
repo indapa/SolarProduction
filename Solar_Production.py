@@ -62,12 +62,12 @@ def main():
     st.markdown("# Solar Production Data" + ':sun_with_face:')
     st.write('You selected:', add_selectbox)
     
-    with st.expander("View Data"):
+    #with st.expander("View Data"):
     
-        AgGrid(data, width=500, height=900)
+    #   AgGrid(data, width=500, height=900)
 
     # Plotting the data
-    st.markdown("# Daily Solar Production" + ':sun_with_face:')
+    #st.markdown("# Daily Solar Production" + ':sun_with_face:')
     
     
     
