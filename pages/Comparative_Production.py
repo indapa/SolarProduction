@@ -38,16 +38,44 @@ def plotly_yearly_production(data):
     st.plotly_chart(fig,use_container_width=True)
 
 
+def plotly_monthly_production_new(data):
+    
+    combined_df = pd.read_csv(solar_file, index_col=0)
+    combined_df['Time'] = pd.to_datetime(data['Time'])  # Convert to datetime format
+    
+    combined_df['MMDD'] = combined_df['Time'].dt.strftime('%m-%d')
+    combined_df['MMDD'] = pd.to_datetime(combined_df['MMDD'], format='%m-%d', errors='coerce')
+    combined_df['MMDD'] = combined_df['MMDD'].apply(lambda x: x.replace(year=2024))
+
+
+    combined_df['YYYY'] = combined_df['Time'].dt.strftime('%Y')
+
+#add a column for cumulative production by year
+
+    combined_df['Cumulative Production'] = combined_df.groupby('YYYY')['Production'].cumsum()
+    combined_df.sort_values(by=['YYYY', 'MMDD'], inplace=True)
+    fig = px.line(combined_df, x='MMDD', y='Cumulative Production', color='YYYY',
+              title='Cumulative Solar Production by Year',
+              labels={'YYYY': 'Year', 'MMDD': 'Month', 'Cumulative Production': 'Cumulative Production'})
+    fig.update_xaxes(dtick="M1", tickformat="%b")
+    
+    st.plotly_chart(fig,use_container_width=True)
 # plot cumulative production by year
 def plotly_cumulative_production(data):
     
     data['Cumulative Production'] = data.groupby('Year')['Production'].cumsum()
     fig = go.Figure()
-    for year, group in data.groupby("Year"):
-        fig.add_trace(go.Scatter(x=group["Time"], y=group["Cumulative Production"], name=year))
-        fig.update_layout(legend_title_text = "Cumulative production")
-        fig.update_xaxes(title_text="Year")
-        fig.update_yaxes(title_text="Production (kWh)")
+    
+    for year, data in data.groupby('Year'):
+        fig.add_trace(go.Scatter(x=data['Time'], y=data['Cumulative Production'], mode='lines', name=f'Year {year}'))
+
+    fig.update_layout(title='Cumulative Production Over Time', xaxis_title='Date', yaxis_title='Cumulative Production')
+    #fig.show()
+    #for year, group in data.groupby("Year"):
+    #    fig.add_trace(go.Scatter(x=group["Time"], y=group["Cumulative Production"], name=year))
+    #    fig.update_layout(legend_title_text = "Cumulative production")
+    #    fig.update_xaxes(title_text="Year")
+    #    fig.update_yaxes(title_text="Production (kWh)")
     
     st.plotly_chart(fig,use_container_width=True)
 
@@ -121,7 +149,8 @@ def main():
     elif time_frame_select == 'month':  
         plotly_monthly_comparative_production(data)
     elif time_frame_select == 'cumulative':
-        plotly_cumulative_production(data)
+        #plotly_cumulative_production(data)
+        plotly_monthly_production_new(data)
     else:
         plotly_quarterly_comparative_production(data)
 

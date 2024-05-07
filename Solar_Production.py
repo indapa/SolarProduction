@@ -64,7 +64,7 @@ def main():
     
     with st.expander("View Data"):
     
-        AgGrid(data, wdith=500, height=900)
+        AgGrid(data, width=500, height=900)
 
     # Plotting the data
     st.markdown("# Daily Solar Production" + ':sun_with_face:')
