@@ -70,12 +70,7 @@ def plotly_cumulative_production(data):
         fig.add_trace(go.Scatter(x=data['Time'], y=data['Cumulative Production'], mode='lines', name=f'Year {year}'))
 
     fig.update_layout(title='Cumulative Production Over Time', xaxis_title='Date', yaxis_title='Cumulative Production')
-    #fig.show()
-    #for year, group in data.groupby("Year"):
-    #    fig.add_trace(go.Scatter(x=group["Time"], y=group["Cumulative Production"], name=year))
-    #    fig.update_layout(legend_title_text = "Cumulative production")
-    #    fig.update_xaxes(title_text="Year")
-    #    fig.update_yaxes(title_text="Production (kWh)")
+    
     
     st.plotly_chart(fig,use_container_width=True)
 
