@@ -94,8 +94,19 @@ def plotly_yearly_comparative_production(data):
     data=data[['Year', 'Production']]
     year_df= data.groupby(['Year']).sum().reset_index()
     year_df.rename(columns={'Production':'Yearly_Production'}, inplace=True)
-    year_df['Year'] = year_df['Year'].astype(str)
+    year_df['Year'] = year_df['Year'].astype('category')
     fig = px.bar(year_df, x='Year', y='Yearly_Production', color='Year', barmode='group')
+    
+    # adjust offset and  width so bars are centered nicely
+    fig.update_traces(offset= -.2, width=0.4)
+    
+    # Improve layout
+    fig.update_layout(
+        xaxis_title="Year",
+        yaxis_title="Yearly Production (kWh)",
+        xaxis=dict(type='category'),  # ensure x-axis is treated as categorical
+        bargap=0.2                    # play with bargap for spacing
+    )
     
     fig.update_layout(xaxis_title="Year", yaxis_title="Yearly Production (kWh)")
     st.plotly_chart(fig)
