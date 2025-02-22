@@ -1,5 +1,6 @@
 import streamlit as st
 import polars as pl
+import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from pathlib import Path
@@ -72,41 +73,54 @@ def plotly_yearly_production():
     st.plotly_chart(fig)
 
 
-def plotly_monthly_production_new(data):
+
+# plot cumulative production by year
+def plotly_cumulative_production():
+    q = (
+    pl.scan_csv("MonthlyData/*.csv", try_parse_dates=True)
+    .select(
+            # Convert the Time column to a proper date
+            pl.col("Time")
+            .str.strptime(pl.Date, format="%m/%d/%Y")
+            .alias("Date"),
+            # Divide by 1000 and alias as kWh for clarity
+            (pl.col("System Production (Wh)") / 1000)
+            .alias("Production"),
     
-    combined_df = pd.read_csv(solar_file, index_col=0)
-    combined_df['Time'] = pd.to_datetime(data['Time'])  # Convert to datetime format
+        )
+        .sort("Date")
+        # add column with cumulative sum
+        .with_columns (
+           
+            year = pl.col("Date").dt.year(),
+        )
+        .with_columns(
+            pl.col("Production").cum_sum().over("year").round(2).alias("cumulative_production"),
+        )
+        
+    )
+    data=q.collect().to_pandas()
+
+    data['Date'] = pd.to_datetime(data['Date'])  # Convert to datetime format
     
-    combined_df['MMDD'] = combined_df['Time'].dt.strftime('%m-%d')
-    combined_df['MMDD'] = pd.to_datetime(combined_df['MMDD'], format='%m-%d', errors='coerce')
-    combined_df['MMDD'] = combined_df['MMDD'].apply(lambda x: x.replace(year=2024))
+    data['MMDD'] = data['Date'].dt.strftime('%m-%d')
+    data['MMDD'] = pd.to_datetime(data['MMDD'], format='%m-%d', errors='coerce')
+    data['MMDD'] = data['MMDD'].apply(lambda x: x.replace(year=2024)) #leap year
 
 
-    combined_df['YYYY'] = combined_df['Time'].dt.strftime('%Y')
+    data['YYYY'] = data['Date'].dt.strftime('%Y')
 
-#add a column for cumulative production by year
+    #add a column for cumulative production by year
 
-    combined_df['Cumulative Production'] = combined_df.groupby('YYYY')['Production'].cumsum()
-    combined_df.sort_values(by=['YYYY', 'MMDD'], inplace=True)
-    fig = px.line(combined_df, x='MMDD', y='Cumulative Production', color='YYYY',
+    data['Cumulative Production'] = data.groupby('YYYY')['Production'].cumsum()
+    data.sort_values(by=['YYYY', 'MMDD'], inplace=True)
+    fig = px.line(data, x='MMDD', y='Cumulative Production', color='YYYY',
               title='Cumulative Solar Production by Year',
               labels={'YYYY': 'Year', 'MMDD': 'Month', 'Cumulative Production': 'Cumulative Production'})
     fig.update_xaxes(dtick="M1", tickformat="%b")
     
     st.plotly_chart(fig,use_container_width=True)
-# plot cumulative production by year
-def plotly_cumulative_production(data):
     
-    data['Cumulative Production'] = data.groupby('Year')['Production'].cumsum()
-    fig = go.Figure()
-    
-    for year, data in data.groupby('Year'):
-        fig.add_trace(go.Scatter(x=data['Time'], y=data['Cumulative Production'], mode='lines', name=f'Year {year}'))
-
-    fig.update_layout(title='Cumulative Production Over Time', xaxis_title='Date', yaxis_title='Cumulative Production')
-    
-    
-    st.plotly_chart(fig,use_container_width=True)
 
 # plot quarterly comparative production
 def plotly_quarterly_comparative_production(data):
@@ -123,53 +137,56 @@ def plotly_quarterly_comparative_production(data):
     fig.update_layout(xaxis_title="Quarter", yaxis_title="Quarterly Production (kWh)")
     st.plotly_chart(fig)
 
-# plot yearly compparative production
-def plotly_yearly_comparative_production(data):
-    data=data[['Year', 'Production']]
-    year_df= data.groupby(['Year']).sum().reset_index()
-    year_df.rename(columns={'Production':'Yearly_Production'}, inplace=True)
-    year_df['Year'] = year_df['Year'].astype('category')
-    fig = px.bar(year_df, x='Year', y='Yearly_Production', color='Year', barmode='group')
+
+
+def plotly_monthly_production():
+    q = (
+        pl.scan_csv("MonthlyData/*.csv", try_parse_dates=True)
+        .select(
+            # Convert the Time column to a proper date
+            pl.col("Time")
+            .str.strptime(pl.Date, format="%m/%d/%Y")
+            .alias("Date"),
+            # Divide by 1000 and alias as kWh for clarity
+            (pl.col("System Production (Wh)") / 1000)
+            .alias("Production"),
     
-    # adjust offset and  width so bars are centered nicely
-    fig.update_traces(offset= -.2, width=0.4)
+        )
+        .with_columns (
+            year_str = pl.col("Date").dt.strftime("%Y"),
+            year_num = pl.col("Date").dt.year(),
+            month_str = pl.col("Date").dt.strftime("%B"),
+            month_num = pl.col("Date").dt.month(),
+        )
+        .group_by([pl.col("year_num"), pl.col("year_str"), pl.col("month_num"), pl.col("month_str")])
+        # sum the production for each month
+        .agg(
+            pl.col("Production").sum().round(2).alias("Monthly_Production")
+        )
+        # round avg_production_kWh to 2 decimal places
     
-    # Improve layout
-    fig.update_layout(
-        xaxis_title="Year",
-        yaxis_title="Yearly Production (kWh)",
-        xaxis=dict(type='category'),  # ensure x-axis is treated as categorical
-        bargap=0.2                    # play with bargap for spacing
+        .sort(["year_num", "month_num"])
+        #convert year_num to string and month_num to string
+        .select(
+            "month_str",
+            "year_str",
+            "Monthly_Production"
+        )
+        .rename(
+            {
+                "month_str": "month",
+                "year_str": "year",
+                "Monthly_Production": "production"
+            }
+        )
+      
     )
-    
-    fig.update_layout(xaxis_title="Year", yaxis_title="Yearly Production (kWh)")
-    st.plotly_chart(fig)
 
-def plotly_monthly_comparative_production(data):
-    data=data[['Year', 'Month', 'Production']]
-    
-    year_month_df= data.groupby(['Year', 'Month']).sum().reset_index()
-    year_month_df.rename(columns={'Production':'Monthly_Production'}, inplace=True)
-    year_month_df['Month'] = pd.to_numeric(year_month_df['Month'])
-    year_month_df['Year'] = pd.to_numeric(year_month_df['Year'])
 
-    numeric_to_abbr={ 1:'January',
-                    2:'February',
-                    3:'March',
-                    4:'April',
-                    5:'May',
-                    6:'June',
-                    7:'July',
-                    8:'August',
-                    9:'September',
-                    10:'October',
-                    11:'November',
-                    12:'December'}
-    year_month_df=year_month_df.replace({"Month": numeric_to_abbr})
-    year_month_df['Year'] = year_month_df['Year'].astype(str)
+    df=q.collect()
 
     
-    fig = px.bar(year_month_df, x='Month', y='Monthly_Production', color='Year', barmode='group')
+    fig = px.bar(df, x='month', y='production', color='year', barmode='group')
     fig.update_layout(xaxis_title="Month", yaxis_title="Monthly Production (kWh)")
 
     st.plotly_chart(fig)
@@ -187,12 +204,13 @@ def main():
     if time_frame_select == 'year':
         plotly_yearly_production()
     elif time_frame_select == 'month':  
-        plotly_monthly_comparative_production(data)
+        plotly_monthly_production()
     elif time_frame_select == 'cumulative':
-        #plotly_cumulative_production(data)
-        plotly_monthly_production_new(data)
+        plotly_cumulative_production()
+        
     else:
-        plotly_quarterly_comparative_production(data)
+        st.write("check back soon")
+        #plotly_quarterly_comparative_production(data)
 
     
     
