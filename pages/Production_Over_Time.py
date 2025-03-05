@@ -7,6 +7,7 @@ from pathlib import Path
 from datetime import datetime
 import pandas as pd
 import plotly.express as px
+import polars as pl
 import plotly.graph_objects as go  # Import Plotly's graph_objects module for adding traces
 
 # Load data
@@ -65,9 +66,26 @@ def _plot_data_over_time(data: pd.DataFrame):
 
 
 def _plot_data_over_time_plotly(data: pd.DataFrame):
-    # Convert the 'Time' column to datetim
-    data['Time'] = pd.to_datetime(data['Time'], errors='coerce')
-    data = data[pd.notna(data['Time'])]
+    q = (
+    pl.scan_csv("MonthlyData/*.csv", try_parse_dates=True)
+    .select(
+            # Convert the Time column to a proper date
+            pl.col("Time")
+            .str.strptime(pl.Date, format="%m/%d/%Y")
+            .alias("Date"),
+            # Divide by 1000 and alias as kWh for clarity
+            (pl.col("System Production (Wh)") / 1000)
+            .alias("Production"),
+    
+        )
+        .sort("Date")
+        
+       
+        
+
+    )
+
+    df = q.collect()
     
     # Calculate the mean value of 'Production'
     mean_production = data['Production'].mean()

@@ -99,7 +99,9 @@ def plotly_cumulative_production():
         )
         
     )
-    data=q.collect().to_pandas()
+    data=q.collect().to_pandas() # convert to pandas dataframe
+
+  
 
     data['Date'] = pd.to_datetime(data['Date'])  # Convert to datetime format
     
@@ -123,17 +125,57 @@ def plotly_cumulative_production():
     
 
 # plot quarterly comparative production
-def plotly_quarterly_comparative_production(data):
+def plotly_quarterly_comparative_production():
     
-    conditions = [ (data['Month'] <=3), (data['Month']  <=6), (data['Month'] <=9), (data['Month'] <=12)]
-    values = ['Q1', 'Q2', 'Q3', 'Q4']
-    data['Quarter']= np.select(conditions, values)
+    q = (
+    pl.scan_csv("MonthlyData/*.csv", try_parse_dates=True)
+    .select(
+            # Convert the Time column to a proper date
+            pl.col("Time")
+            .str.strptime(pl.Date, format="%m/%d/%Y")
+            .alias("Date"),
+            # Divide by 1000 and alias as kWh for clarity
+            (pl.col("System Production (Wh)") / 1000)
+            .alias("Production"),
     
-    data=data[['Year', 'Quarter', 'Production']]
-    year_quarter_df= data.groupby(['Year', 'Quarter']).sum().reset_index()
-    year_quarter_df.rename(columns={'Production':'Quarterly_Production'}, inplace=True)
-    year_quarter_df['Year'] = year_quarter_df['Year'].astype(str)
-    fig = px.bar(year_quarter_df, x='Quarter', y='Quarterly_Production', color='Year', barmode='group')
+        )
+        .sort("Date")
+        .with_columns (
+            
+            month = pl.col("Date").dt.month(),
+            year = pl.col("Date").dt.year(),
+        )
+        .with_columns(
+            pl.when(pl.col("month") <= 3).then(1)
+            .when(pl.col("month") <= 6).then(2)
+            .when(pl.col("month") <= 9).then(3)
+            .otherwise(4)
+            .alias("Quarter")
+
+        )
+        .group_by(["year", "Quarter"])
+        # compute quarterly production
+        .agg(
+            pl.col("Production").sum().round(2).alias("Quarterly_Production")
+        )
+        .sort(["year", "Quarter"])
+        .select(
+            "year",
+            "Quarter",
+            "Quarterly_Production"
+        )
+        .with_columns(
+            pl.col("Quarter").replace_strict([1, 2, 3,4], ["Q1", "Q2", "Q3", "Q4"]).alias("Quarter"),
+            pl.col("year").cast(pl.Utf8).alias("year")
+        )
+        #cast year to string
+       
+        
+  
+)
+
+    year_quarter_df=q.collect()
+    fig = px.bar(year_quarter_df, x='year', y='Quarterly_Production', color='Quarter', barmode='group')
     fig.update_layout(xaxis_title="Quarter", yaxis_title="Quarterly Production (kWh)")
     st.plotly_chart(fig)
 
@@ -209,8 +251,8 @@ def main():
         plotly_cumulative_production()
         
     else:
-        st.write("check back soon")
-        #plotly_quarterly_comparative_production(data)
+        
+        plotly_quarterly_comparative_production()
 
     
     
