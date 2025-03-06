@@ -25,15 +25,13 @@ add_selectbox = st.sidebar.selectbox(
 
 # read in the data into a lazy frame
 q = (
-    pl.scan_csv("MonthlyData/*.csv", try_parse_dates=True)
-    .select(
+    pl.scan_csv(solar_file)
+    .with_columns(
         # Convert the Time column to a proper date
         pl.col("Time")
-          .str.strptime(pl.Date, format="%m/%d/%Y")
+          .str.strptime(pl.Date, format="%Y-%m-%d")
           .alias("Date"),
-        # Divide by 1000 and alias as kWh for clarity
-        (pl.col("System Production (Wh)") / 1000)
-          .alias("Production"),
+        
           
     )
     .with_columns (
