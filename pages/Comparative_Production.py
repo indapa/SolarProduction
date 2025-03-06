@@ -23,15 +23,12 @@ time_frame_select = st.sidebar.selectbox(
 # plot cumulative production by year, with each year as  line
 def plotly_yearly_production():
     q = (
-        pl.scan_csv("MonthlyData/*.csv")
-         .select(
+        pl.scan_csv(solar_file)
+         .with_columns(
             # Convert the Time column to a proper date
             pl.col("Time")
-            .str.strptime(pl.Date, format="%m/%d/%Y")
-            .alias("Date"),
-            # Divide by 1000 and alias as kWh for clarity
-             (pl.col("System Production (Wh)") / 1000)
-             .alias("Production"),
+            .str.strptime(pl.Date, format="%Y-%m-%d") 
+            .alias("Date")
             
     
         )
@@ -77,15 +74,13 @@ def plotly_yearly_production():
 # plot cumulative production by year
 def plotly_cumulative_production():
     q = (
-    pl.scan_csv("MonthlyData/*.csv", try_parse_dates=True)
-    .select(
+    pl.scan_csv(solar_file)
+    .with_columns(
             # Convert the Time column to a proper date
             pl.col("Time")
-            .str.strptime(pl.Date, format="%m/%d/%Y")
+            .str.strptime(pl.Date, format="%Y-%m-%d")
             .alias("Date"),
-            # Divide by 1000 and alias as kWh for clarity
-            (pl.col("System Production (Wh)") / 1000)
-            .alias("Production"),
+            
     
         )
         .sort("Date")
@@ -99,7 +94,7 @@ def plotly_cumulative_production():
         )
         
     )
-    data=q.collect().to_pandas() # convert to pandas dataframe
+    data=q.collect().to_pandas() # convert to pandas dataframe because I can't figure out how to plot cumulative sum in polars
 
   
 
@@ -128,15 +123,13 @@ def plotly_cumulative_production():
 def plotly_quarterly_comparative_production():
     
     q = (
-    pl.scan_csv("MonthlyData/*.csv", try_parse_dates=True)
-    .select(
+    pl.scan_csv(solar_file)
+    .with_columns(
             # Convert the Time column to a proper date
             pl.col("Time")
-            .str.strptime(pl.Date, format="%m/%d/%Y")
+            .str.strptime(pl.Date, format="%Y-%m-%d")
             .alias("Date"),
-            # Divide by 1000 and alias as kWh for clarity
-            (pl.col("System Production (Wh)") / 1000)
-            .alias("Production"),
+            
     
         )
         .sort("Date")
@@ -183,15 +176,13 @@ def plotly_quarterly_comparative_production():
 
 def plotly_monthly_production():
     q = (
-        pl.scan_csv("MonthlyData/*.csv", try_parse_dates=True)
-        .select(
+        pl.scan_csv(solar_file)
+        .with_columns(
             # Convert the Time column to a proper date
             pl.col("Time")
-            .str.strptime(pl.Date, format="%m/%d/%Y")
+            .str.strptime(pl.Date, format="%Y-%m-%d")
             .alias("Date"),
-            # Divide by 1000 and alias as kWh for clarity
-            (pl.col("System Production (Wh)") / 1000)
-            .alias("Production"),
+            
     
         )
         .with_columns (
