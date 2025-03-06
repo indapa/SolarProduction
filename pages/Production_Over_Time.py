@@ -14,7 +14,7 @@ import plotly.graph_objects as go  # Import Plotly's graph_objects module for ad
 st.sidebar.markdown("# Production Over Time" + ':chart:')
 solar_file = Path(__file__).parent.parent / "solar_production.csv"
 data = (
-    pl.read_csv("solar_production.csv")
+    pl.read_csv(solar_file)
     .with_columns(
         # Convert the Time column to a proper date
         pl.col("Time")
@@ -27,8 +27,7 @@ data = (
 
 start_date = data['Time'].min()
 end_date = data['Time'].max()
-#start_date=start_date.to_pydatetime()
-#end_date=end_date.to_pydatetime()
+
 # create a date slidebar to select date range
 date_range = st.sidebar.slider('Select Date Range', start_date, end_date, (start_date, end_date))
 
@@ -75,7 +74,7 @@ def main():
   
     fig =_plot_data_over_time_plotly(data)
 
-    #st.pyplot(plt)
+    
     st.plotly_chart(fig)
     
 
