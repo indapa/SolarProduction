@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import polars as pl
 import matplotlib.pyplot as plt
 import seaborn as sns
 from pathlib import Path
@@ -13,22 +14,43 @@ solar_file = Path(__file__).parent / "solar_production.csv"
 data = pd.read_csv(solar_file, index_col=0)
 
 
-data['Time'] = pd.to_datetime(data['Time'])  # Convert to datetime format
-data['Year'] = data['Time'].dt.strftime("%Y") # Extract year information
-data['Month'] = data['Time'].dt.strftime("%B") # Extract month information
-years = data['Year'].unique()
+
+years = ['2025', '2024', '2023', '2022', '2021']
 # Add a selectbox to the sidebar:
 add_selectbox = st.sidebar.selectbox(
     'Select Year',
-    ( years ), index=4
+    ( years ), index=0
 )
 
 
-#subset data to selected year
-data = data[data['Year'] == add_selectbox]
+# read in the data into a lazy frame
+q = (
+    pl.scan_csv(solar_file)
+    .with_columns(
+        # Convert the Time column to a proper date
+        pl.col("Time")
+          .str.strptime(pl.Date, format="%Y-%m-%d")
+          .alias("Date"),
+        
+          
+    )
+    .with_columns (
+        year = pl.col("Date").dt.strftime("%Y"),
+        month = pl.col("Date").dt.strftime("%B"),
+        
+    )
+    .filter(pl.col("year") == add_selectbox)
+    
+    .sort("Date")
+)
 
-data['cumulative']=data['Production'].cumsum()
-# Streamlit app code
+# execute the query and collect the results into a DataFrame
+data= q.collect()  
+# add a cumulative column
+data = data.with_columns(pl.col("Production").cum_sum().alias("cumulative")) # add a cumulative column
+
+
+
 
 
 # function to plot power function in plotly
@@ -36,7 +58,7 @@ def plot_power_production_plotly(data):
     #data['Time'] = pd.to_datetime(data['Time'])  # Convert to datetime format
     #data['Month'] = data['Time'].dt.strftime("%B") # Extract month information
     
-    fig = px.box(data, x='Month', y='Production', color='Month', points="all", 
+    fig = px.box(data, x='month', y='Production', color='month', points="all", 
                  width=900, height=900)
        
     fig.update_traces(quartilemethod="exclusive")  # or "inclusive", or "linear" by default
@@ -45,14 +67,10 @@ def plot_power_production_plotly(data):
 
 
     
-# add multiple traces to plotly express line plot for each year
-
-
-
-
 def plot_cumulative_power_production_plotly(data):
-    fig = px.line(data, x='Time', y='cumulative', width=900, height=900)
-    fig.update_layout(xaxis_title="Time", yaxis_title="Cumulative Production (kWh)")
+
+    fig = px.line(data, x='Date', y='cumulative', width=900, height=900)
+    fig.update_layout(xaxis_title="Date", yaxis_title="Cumulative Production (kWh)")
     st.plotly_chart(fig,use_container_width=True)
 
 def main():
@@ -62,22 +80,8 @@ def main():
     st.markdown("# Solar Production Data" + ':sun_with_face:')
     st.write('You selected:', add_selectbox)
     
-    #with st.expander("View Data"):
-    
-    #   AgGrid(data, width=500, height=900)
-
-    # Plotting the data
-    #st.markdown("# Daily Solar Production" + ':sun_with_face:')
-    
-    
-    
-    #plot_power_production(data)
     plot_power_production_plotly(data)
 
-
-    # Plotting cumulative power production
-    st.markdown("# Cumulative Solar Production"  + ':sun_with_face:')
-    
     plot_cumulative_power_production_plotly(data)
   
 
