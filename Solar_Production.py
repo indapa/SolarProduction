@@ -1,17 +1,13 @@
 import streamlit as st
-import pandas as pd
 import polars as pl
-import matplotlib.pyplot as plt
-import seaborn as sns
 from pathlib import Path
-import sys
 import plotly.express as px
-from st_aggrid import AgGrid
+
 st.set_page_config(layout="wide")
 st.sidebar.markdown("# Daily production" +  ':chart:')
 solar_file = Path(__file__).parent / "solar_production.csv"
 # Load data
-data = pd.read_csv(solar_file, index_col=0)
+
 
 
 
@@ -24,8 +20,8 @@ add_selectbox = st.sidebar.selectbox(
 
 
 # read in the data into a lazy frame
-q = (
-    pl.scan_csv(solar_file)
+data = (
+    pl.read_csv(solar_file)
     .with_columns(
         # Convert the Time column to a proper date
         pl.col("Time")
@@ -44,8 +40,7 @@ q = (
     .sort("Date")
 )
 
-# execute the query and collect the results into a DataFrame
-data= q.collect()  
+
 # add a cumulative column
 data = data.with_columns(pl.col("Production").cum_sum().alias("cumulative")) # add a cumulative column
 
