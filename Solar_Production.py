@@ -35,7 +35,7 @@ data = (
         month = pl.col("Date").dt.strftime("%B"),
         
     )
-    .filter(pl.col("year") == add_selectbox)
+    .filter(pl.col("year") == add_selectbox) # filter the data by year selected
     
     .sort("Date")
 )
