@@ -1,0 +1,12 @@
+AstronomyData/** 
+
+MonthlyData/** 
+
+Yearly_Report_20*/** 
+
+*.html
+
+.venv/
+.uv/
+__pycache__/
+*.pyc
