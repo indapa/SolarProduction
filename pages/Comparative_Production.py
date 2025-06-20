@@ -1,14 +1,8 @@
 import streamlit as st
 import polars as pl
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
 from pathlib import Path
-import sys
 import plotly.express as px
-import numpy as np
-from st_aggrid import AgGrid
-import plotly.graph_objects as go
 
 
 # Load data

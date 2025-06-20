@@ -1,12 +1,8 @@
-import seaborn as sns
 import pandas as pd
-import matplotlib.pyplot as plt
 import streamlit as st
 import plotly.express as px
 from pathlib import Path
-from datetime import datetime
 
-import plotly.express as px
 import polars as pl
 import plotly.graph_objects as go  # Import Plotly's graph_objects module for adding traces
 
