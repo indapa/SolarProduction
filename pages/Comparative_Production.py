@@ -149,9 +149,9 @@ def plotly_quarterly_comparative_production():
     year_quarter_df = q.collect()
     fig = px.bar(
         year_quarter_df,
-        x="year",
+        x="Quarter",
         y="Quarterly_Production",
-        color="Quarter",
+        color="year",
         barmode="group",
     )
     fig.update_layout(xaxis_title="Quarter", yaxis_title="Quarterly Production (kWh)")
