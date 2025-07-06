@@ -27,6 +27,8 @@ for filepath in glob.glob("MonthlyData/*.csv"):
 # Concatenate and sort all data
 if dfs:
     combined = pl.concat(dfs).sort("Time")
+    #drop duplicates if any
+    combined = combined.unique(subset=["Time"])
     combined.write_csv("solar_production.csv")
 else:
     print("No valid files found.")
